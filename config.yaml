@@ -1,0 +1,23 @@
+timeout: 365
+
+testing:
+  user_msg: nikolas  #user that will get the test notification
+
+channels:
+  adding:
+    - alumni
+  cleanup:
+    - bar
+    - kafé
+    - arragement
+    - promotering
+    - dj
+    - utlån
+
+
+message: |\n
+  Hi! We are currenly doing some automated cleaning of the work groups. 
+  The groups (like Kafe, Bar etc) is intended for active communication,
+  we have therefore removed inactive members and added them to the alumnus channel.
+  
+  If you feel a mistake has been made, please rejoin the channels in question :)
