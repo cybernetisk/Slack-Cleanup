@@ -1,9 +1,12 @@
 timeout: 365
 
 testing:
-  user_msg: nikolas  #user that will get the test notification
+  #user that will get the test notification
+  user_msg: nikolas
 
 channels:
+  logging:
+    - logging-vaskehjelp
   adding:
     - alumni
   cleanup:
@@ -14,6 +17,8 @@ channels:
     - dj
     - utlån
 
+
+# Testes med poetry
 message: |
   Hi! We are currenly doing some automated cleaning of the work groups. 
   The groups (like Kafe, Bar etc) is intended for active communication,

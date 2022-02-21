@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 from typing import List
 import yaml
-import pathlib
+from pathlib import Path
 
-from pydantic import BaseModel, create_model
+from pydantic import BaseModel
+
+_ROOT_PATH = Path(__file__).parent.absolute()
 
 
 class Testing(BaseModel):
@@ -11,6 +13,7 @@ class Testing(BaseModel):
 
 
 class Channels(BaseModel):
+    logging: List[str]
     adding: List[str]
     cleanup: List[str]
 
@@ -20,7 +23,6 @@ class Config(BaseModel):
     timeout: int
     testing: Testing
     channels: Channels
-
     message: str
 
 
@@ -36,13 +38,13 @@ class Auth(BaseModel):
 
 
 def _get_auth() -> Auth:
-    f = pathlib.Path("auth.yaml").open("r")
+    f = (_ROOT_PATH / "auth.yaml").open("r")
     y = yaml.safe_load(f)
     return Auth.parse_obj(y)
 
 
 def _get_config() -> Config:
-    f = pathlib.Path("config.yaml").open("r")
+    f = (_ROOT_PATH / "config.yaml").open("r")
     y = yaml.safe_load(f)
     return Config.parse_obj(y)
 

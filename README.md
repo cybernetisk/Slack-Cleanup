@@ -10,9 +10,9 @@
    1) https://cybernetisk.slack.com/services/export
 2) Unzip the folder into the workspace folder
    1) Workspace/<list of channels++>
-3) Get temporary token via
-   1) Generate token https://api.slack.com/apps/
-   2) TODO: Fix oauth instead
+3) Get the token from one of these links. Populate the auth.yaml.example file:
+   1) https://wiki.cyb.no/display/X/Vaskehjelpe+creds
+   2) https://api.slack.com/apps/A033TEQEQ30
 
 
 ### Run the program
@@ -29,5 +29,9 @@
 ## How to configure
 
 
-##
+## How to test functions
+### The message
+
+* Config the test target 
+* Run `SLACK_TOKEN=<token> poetry run test-msg`
 

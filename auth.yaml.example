@@ -1,3 +1,5 @@
+# Get the creds from here: https://api.slack.com/apps/A033TEQEQ30
+#
 app_id: <app_id>
 client:
   id: <id>
