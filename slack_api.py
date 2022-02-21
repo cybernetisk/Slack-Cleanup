@@ -114,7 +114,12 @@ class Api:
         )
 
     def convo_join_silent(self, channel_id):
-        self.api.conversations_join(channel=channel_id)
+        logger.info(f"Joining {channel_id}")
+        if self.live:
+            self.api.conversations_join(channel=channel_id)
+        elif self.test:
+            assert channel_id == self.convo_testing()["id"]
+            self.api.conversations_join(channel=channel_id)
 
     def convo_dm_by_user_id(self, user_id):
         """

@@ -41,15 +41,28 @@ def test_user_channel_test_add(config, api):
 
     api.user_add(target_channel["id"], target_user_id)
 
-    members = api.convo_list_members(target_channel["id"])
+    resp = api.convo_list_members(target_channel["id"])
+    members = resp.data["members"]
 
-    print(members)
+    assert target_user_id in members
 
 
+# TODO: Remove test will fail untill the app gets the access it needs..
 @pytest.mark.order(after="test_user_channel_test_add")
 def test_user_channel_test_remove(config, auth, api):
     target_channel = api.convo_testing()
     target_user_id = config.testing.user_test
+    api.convo_join_silent(target_channel["id"])
+
+    resp = api.convo_list_members(target_channel["id"])
+    members = resp.data["members"]
+    assert target_user_id in members, "User we want to kick not in members"
+
+    api.user_remove(target_channel["id"], target_user_id)
+
+    resp = api.convo_list_members(target_channel["id"])
+    members = resp.data["members"]
+    assert target_user_id not in members, "User we want to kick still there"
 
 
 def test_list_channels(config, auth, api):

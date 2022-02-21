@@ -24,14 +24,11 @@
 3) Install python env
    1) `poetry install`
 4) Run script
-   1) `SLACK_TOKEN=<token> poetry run cleanup`
+   1) `poetry run cleanup`
 
 ## How to configure
 
 
 ## How to test functions
-### The message
-
-* Config the test target 
-* Run `SLACK_TOKEN=<token> poetry run test-msg`
-
+I opted for using PyTest to start off with.
+In pycharm they are trivial to run, just navigate into the files in the tests folder and right-click
