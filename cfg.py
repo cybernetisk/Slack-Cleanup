@@ -10,10 +10,12 @@ _ROOT_PATH = Path(__file__).parent.absolute()
 
 class Testing(BaseModel):
     user_msg: str
+    user_test: str
 
 
 class Channels(BaseModel):
-    logging: List[str]
+    testing: str
+    logging: str
     adding: List[str]
     cleanup: List[str]
 

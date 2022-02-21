@@ -2,11 +2,13 @@ timeout: 365
 
 testing:
   #user that will get the test notification
-  user_msg: nikolas
+  # Find user in slack sidebar -> View full profile
+  user_msg: U03SNA4F0 # nikolas
+  user_test: U02KRH15ZBK # Nikolas (slettmeg)
 
 channels:
-  logging:
-    - logging-vaskehjelp
+  testing: test-vaskehjelp
+  logging: logging-vaskehjelp
   adding:
     - alumni
   cleanup:
@@ -20,7 +22,8 @@ channels:
 
 # Testes med poetry
 message: |
-  Hi! We are currenly doing some automated cleaning of the work groups. 
+  Hi! 
+  We are currenly doing some automated cleaning of the work groups. 
   The groups (like Kafe, Bar etc) is intended for active communication,
   we have therefore removed inactive members and added them to the alumnus channel.
   
