@@ -1,0 +1,4 @@
+app_id: <app_id>
+client:
+  id: <id>
+  secret: <secret>

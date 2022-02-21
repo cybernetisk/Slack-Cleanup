@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
 
 import typer
+from config import config
 
 app = typer.Typer()
+from slack_api import Api
 
 
-@app.command
-def test_msg(
-    token: str = typer.Argument(None, envvar="SLACK_TOKEN"),
-):
+@app.command()
+def test_msg():
+    api = Api()
+    channels = api.conversations()
     pass
 
 
-@app.command
+@app.command()
 def cleanup(
-    token: str = typer.Argument(None, envvar="SLACK_TOKEN"),
     dry: bool = typer.Option(False),
 ):
     pass

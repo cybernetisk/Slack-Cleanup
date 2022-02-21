@@ -10,9 +10,10 @@
    1) https://cybernetisk.slack.com/services/export
 2) Unzip the folder into the workspace folder
    1) Workspace/<list of channels++>
+3) Get temporary token via
+   1) Generate token https://api.slack.com/apps/
+   2) TODO: Fix oauth instead
 
-
-https://api.slack.com/apps/
 
 ### Run the program
 
@@ -23,7 +24,7 @@ https://api.slack.com/apps/
 3) Install python env
    1) `poetry install`
 4) Run script
-   1) `poetry run cleanup`
+   1) `SLACK_TOKEN=<token> poetry run cleanup`
 
 ## How to configure
 

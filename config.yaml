@@ -14,8 +14,7 @@ channels:
     - dj
     - utlån
 
-
-message: |\n
+message: |
   Hi! We are currenly doing some automated cleaning of the work groups. 
   The groups (like Kafe, Bar etc) is intended for active communication,
   we have therefore removed inactive members and added them to the alumnus channel.
