@@ -47,7 +47,7 @@ def test_user_channel_test_add(config, api):
     assert target_user_id in members
 
 
-# TODO: Remove test will fail untill the app gets the access it needs..
+# TODO: Remove test will fail until the app gets the access it needs..
 @pytest.mark.order(after="test_user_channel_test_add")
 def test_user_channel_test_remove(config, auth, api):
     target_channel = api.convo_testing()

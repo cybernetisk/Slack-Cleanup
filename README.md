@@ -32,3 +32,19 @@
 ## How to test functions
 I opted for using PyTest to start off with.
 In pycharm they are trivial to run, just navigate into the files in the tests folder and right-click
+
+
+# What to do
+
+## We need to define what is an inactive member
+* Fetch channel message history
+  * https://api.slack.com/methods/search.messages
+    * For user in users:
+      * Search from:@user in#channel
+* Find all messages:
+  * https://api.slack.com/methods/conversations.history
+    * Find all messages back to timeout
+      * Iterate over all
+* Fetch channel events
+  * Is it possible?
+* Fetch user activity
