@@ -1,14 +1,10 @@
 import pytest
 
-from random import sample
-from string import ascii_lowercase
-
-from slack_api import Api
-from loguru import logger
-
 from tests.common import auth, config
-
 from export import Export
+
+_ = auth
+_ = config
 
 
 @pytest.fixture(autouse=True, scope="session")
@@ -36,5 +32,4 @@ def test_filter_on_age(export: Export, config):
     assert len(data) == 9
 
     to_be_removed = export.filter_on_age(data, config.timeout)
-
-    print(data)
+    assert len(to_be_removed.keys()) == 9

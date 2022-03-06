@@ -3,7 +3,6 @@ from pathlib import Path
 import datetime
 import json
 
-import helpers
 
 ROOT_PATH = Path(__file__).parent.absolute()
 
@@ -16,6 +15,10 @@ def _find_in_dicts(target: str, key: str, dicts: List[dict]):
         return next(item for item in dicts if item[key] == target)
     except StopIteration:
         return None
+
+
+def get_name_obj(x: str) -> dict:
+    return _find_in_dicts(x, "name", channels) or _find_in_dicts(x, "name", users)
 
 
 def get_id_obj(x: str) -> dict:
@@ -70,6 +73,6 @@ def convert_dict_to_name_and_id(x: dict) -> dict:
     d = {}
 
     for k, v in x.items():
-        d[helpers.convert_id_to_name(k)] = helpers.convert_epoch_to_date(v)
+        d[convert_id_to_name(k)] = convert_epoch_to_date(v)
 
     return d

@@ -6,6 +6,7 @@ import slack_sdk
 from slack_sdk.errors import SlackApiError
 from slack_sdk.web import SlackResponse
 
+import helpers
 from cfg import config, auth
 from loguru import logger
 from functools import cache
@@ -14,7 +15,7 @@ from functools import cache
 class ConvoOverview(BaseModel):
     convo_testing: Dict
     convo_logging: Dict
-    convo_adding: Dict
+    convo_adding: List[Dict]
     convo_cleanup: List[Dict]
 
 
@@ -42,67 +43,31 @@ class Api:
         self.conversations()
 
     @cache
-    def convo_testing(self):
+    def convo_testing(self) -> dict:
         return self.conversations().convo_testing
 
     @cache
-    def convo_logging(self):
+    def convo_logging(self) -> dict:
         return self.conversations().convo_logging
 
     @cache
-    def convo_adding(self):
+    def convo_adding(self) -> List[dict]:
         return self.conversations().convo_adding
 
     @cache
-    def convo_cleanup(self):
+    def convo_cleanup(self) -> List[dict]:
         return self.conversations().convo_cleanup
 
-    @cache
+    # TODO: Download new export
     def conversations(self) -> ConvoOverview:
         """
-        Fetches the data for the conversations listed in channels.logging, channels.adding and channels.cleanup
         :return: { convo_logging: List[], convo_adding: List[], convo_clenaup: List[]}
         """
 
-        convo_testing = None
-        convo_logging = None
-        convo_adding = None
-        convo_cleanup = []
-
-        logger.info("Fetching convos")
-        resp = self.api.conversations_list(limit=1000, types="public_channel")
-        conversations_all = resp.data["channels"]
-
-        logger.info(f"Found {len(conversations_all)} convos")
-        logger.info("Filtering...")
-
-        for convo in conversations_all:
-            name = convo["name"]
-            id = convo["id"]
-
-            if name == config.channels.logging:
-                if convo_logging:
-                    logger.critical("Found multiple matches for logging convo")
-                    exit(1)
-                convo_logging = convo
-                logger.info(f"Found logging convo {id} {name}")
-
-            elif name == config.channels.testing:
-                if convo_testing:
-                    logger.critical("Found multiple matches for testing convo")
-                    exit(1)
-                convo_testing = convo
-
-            elif name in config.channels.adding:
-                if convo_adding:
-                    logger.critical("Found multiple matches for adding convo")
-                    exit(1)
-                convo_adding = convo
-                logger.info(f"Found adding convo {id} {name}")
-
-            elif name in config.channels.cleanup:
-                convo_cleanup.append(convo)
-                logger.info(f"Found cleanup convo {id} {name}")
+        convo_logging = helpers.get_name_obj(config.channels.logging)
+        convo_testing = helpers.get_name_obj(config.channels.testing)
+        convo_adding = [helpers.get_name_obj(c) for c in config.channels.adding]
+        convo_cleanup = [helpers.get_name_obj(c) for c in config.channels.cleanup]
 
         return ConvoOverview(
             **{
