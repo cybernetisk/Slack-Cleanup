@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 from typing import List
 import yaml
-from pathlib import Path
+from helpers import ROOT_PATH
 
 from pydantic import BaseModel
-
-_ROOT_PATH = Path(__file__).parent.absolute()
 
 
 class Testing(BaseModel):
@@ -40,13 +38,13 @@ class Auth(BaseModel):
 
 
 def _get_auth() -> Auth:
-    f = (_ROOT_PATH / "auth.yaml").open("r")
+    f = (ROOT_PATH / "auth.yaml").open("r")
     y = yaml.safe_load(f)
     return Auth.parse_obj(y)
 
 
 def _get_config() -> Config:
-    f = (_ROOT_PATH / "config.yaml").open("r")
+    f = (ROOT_PATH / "config.yaml").open("r")
     y = yaml.safe_load(f)
     return Config.parse_obj(y)
 
