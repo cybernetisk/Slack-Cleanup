@@ -1,6 +1,9 @@
 from typing import Union, Iterable, List
 from pathlib import Path
+import datetime
 import json
+
+import helpers
 
 ROOT_PATH = Path(__file__).parent.absolute()
 
@@ -50,3 +53,23 @@ def convert_id_to_name(x: Union[str, Iterable]) -> Union[str, List]:
         return [get_id(i) for i in x]
 
     return get_id(x)
+
+
+def convert_epoch(x: float):
+    return datetime.datetime.fromtimestamp(x).strftime("%Y-%m-%d")
+
+
+def convert_epoch_to_date(x: Union[float, Iterable]) -> Union[str, List]:
+    if isinstance(x, Iterable):
+        return [convert_epoch(i) for i in x]
+
+    return convert_epoch(x)
+
+
+def convert_dict_to_name_and_id(x: dict) -> dict:
+    d = {}
+
+    for k, v in x.items():
+        d[helpers.convert_id_to_name(k)] = helpers.convert_epoch_to_date(v)
+
+    return d

@@ -36,4 +36,5 @@ def test_filter_on_age(export: Export, config):
     assert len(data) == 9
 
     to_be_removed = export.filter_on_age(data, config.timeout)
+
     print(data)
