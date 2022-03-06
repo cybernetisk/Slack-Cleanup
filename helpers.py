@@ -1,4 +1,4 @@
-from typing import Union, Any, Iterable, List
+from typing import Union, Iterable, List
 from pathlib import Path
 import json
 
@@ -15,7 +15,11 @@ def _find_in_dicts(target: str, key: str, dicts: List[dict]):
         return None
 
 
-def get_id(x: str) -> dict:
+def get_id_obj(x: str) -> dict:
+    return _find_in_dicts(x, "id", channels) or _find_in_dicts(x, "id", users)
+
+
+def get_id(x: str) -> str:
     """
     Tries to check the users first for a match, then channels.
     I am assuming there is not overlap in the IDs
@@ -23,18 +27,26 @@ def get_id(x: str) -> dict:
     :return: For users: "Real name" for Channels: "Name"
     """
 
-    ret = _find_in_dicts(x, "id", channels) or _find_in_dicts(x, "id", users)
-    if not None:
-        raise RuntimeError("ID not found")
-    return ret
+    ret = _find_in_dicts(x, "id", channels)
+    if ret:
+        return ret["name"]
+    ret = _find_in_dicts(x, "id", users)
+    if ret:
+        return ret["name"]
+
+    raise RuntimeError("ID not found")
 
 
-def convert_id_to_name(x: Union[str, Iterable]) -> Union[Any, List]:
+def convert_id_to_name(x: Union[str, Iterable]) -> Union[str, List]:
     """
     :param x: Item or iterable to check agains channels and users
     :return: The "Real name" of the users or channels
     """
 
+    if isinstance(x, str):
+        return get_id(x)
+
     if isinstance(x, Iterable):
         return [get_id(i) for i in x]
+
     return get_id(x)
