@@ -69,7 +69,7 @@ def convert_epoch_to_date(x: Union[float, Iterable]) -> Union[str, List]:
     return convert_epoch(x)
 
 
-def convert_dict_to_name_and_id(x: dict) -> dict:
+def convert_dict_to_name_and_date(x: dict) -> dict:
     d = {}
 
     for k, v in x.items():
