@@ -79,12 +79,14 @@ class Api:
         )
 
     def convo_join_silent(self, channel_id):
-        logger.info(f"Joining {channel_id}")
         if self.live:
+            logger.info(f"Joining {channel_id}")
             self.api.conversations_join(channel=channel_id)
         elif self.test:
             assert channel_id == self.convo_testing()["id"]
             self.api.conversations_join(channel=channel_id)
+        else:
+            logger.info(f"[DRY] Joining {channel_id}")
 
     def convo_dm_by_user_id(self, user_id):
         """
@@ -103,13 +105,6 @@ class Api:
     def convo_list_members(self, channel_id) -> SlackResponse:
         return self.api.conversations_members(channel=channel_id, limit=1000)
 
-    def convo_get_by_name(self, channel_name):
-        for convo in self.conversations():
-            if convo["name"] == channel_name:
-                return convo
-
-        raise RuntimeError("Unable to find channel")
-
     def convo_get(self, channel_id):
         return self.api.conversations_info(channel=channel_id)
 
@@ -120,35 +115,39 @@ class Api:
         return self.api.users_info(user=user_id)
 
     def user_remove(self, channel_id, user_id):
-        logger.debug(f"Removing {user_id} from {channel_id}")
 
         if self.live:
+            logger.debug(f"Removing {user_id} from {channel_id}")
             self.api.conversations_kick(channel=channel_id, user=user_id)
         elif self.test:
             assert channel_id == self.convo_testing()["id"]
             assert user_id == config.testing.user_test
             self.api.conversations_kick(channel=channel_id, user=user_id)
+        else:
+            logger.debug(f"[DRY] Removing {user_id} from {channel_id}")
 
     def user_add(self, channel_id, user_id):
-        logger.debug(f"Adding {user_id} to {channel_id}")
-
         try:
-
             if self.live:
+                logger.debug(f"Adding {user_id} to {channel_id}")
                 self.api.conversations_invite(channel=channel_id, users=user_id)
             elif self.test:
                 assert channel_id == self.convo_testing()["id"]
                 assert user_id == config.testing.user_test
                 self.api.conversations_invite(channel=channel_id, users=user_id)
+            else:
+                logger.debug(f"[DRY] Adding {user_id} to {channel_id}")
 
         except SlackApiError as e:
             if e.response.data["error"] != "already_in_channel":
                 raise e
 
     def msg_user(self, user_id, msg):
-        logger.debug(f"Sending {user_id} a msg")
         if self.live:
+            logger.debug(f"Sending {user_id} a msg")
             self.api.chat_postMessage(channel=user_id, text=msg)
         elif self.test:
             assert user_id == config.testing.user_msg
             self.api.chat_postMessage(channel=user_id, text=msg)
+        else:
+            logger.debug(f"[DRY] Sending {user_id} a msg")
