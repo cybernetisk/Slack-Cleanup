@@ -1,4 +1,4 @@
-timeout: 365
+timeout: 800 # Number of days of inactivity that is allowed
 
 testing:
   #user that will get the test notification
@@ -14,10 +14,11 @@ channels:
   cleanup:
     - bar
     - kafé
-    - arragement
+    - arrangement
     - promotering
     - dj
     - utlån
+    - økonomi
 
 
 # Testes med poetry

@@ -6,6 +6,7 @@ import slack_sdk
 from slack_sdk.errors import SlackApiError
 from slack_sdk.web import SlackResponse
 
+import helpers
 from cfg import config, auth
 from loguru import logger
 from functools import cache
@@ -14,7 +15,7 @@ from functools import cache
 class ConvoOverview(BaseModel):
     convo_testing: Dict
     convo_logging: Dict
-    convo_adding: Dict
+    convo_adding: List[Dict]
     convo_cleanup: List[Dict]
 
 
@@ -42,67 +43,31 @@ class Api:
         self.conversations()
 
     @cache
-    def convo_testing(self):
+    def convo_testing(self) -> dict:
         return self.conversations().convo_testing
 
     @cache
-    def convo_logging(self):
+    def convo_logging(self) -> dict:
         return self.conversations().convo_logging
 
     @cache
-    def convo_adding(self):
+    def convo_adding(self) -> List[dict]:
         return self.conversations().convo_adding
 
     @cache
-    def convo_cleanup(self):
+    def convo_cleanup(self) -> List[dict]:
         return self.conversations().convo_cleanup
 
-    @cache
+    # TODO: Download new export
     def conversations(self) -> ConvoOverview:
         """
-        Fetches the data for the conversations listed in channels.logging, channels.adding and channels.cleanup
         :return: { convo_logging: List[], convo_adding: List[], convo_clenaup: List[]}
         """
 
-        convo_testing = None
-        convo_logging = None
-        convo_adding = None
-        convo_cleanup = []
-
-        logger.info("Fetching convos")
-        resp = self.api.conversations_list(limit=1000, types="public_channel")
-        conversations_all = resp.data["channels"]
-
-        logger.info(f"Found {len(conversations_all)} convos")
-        logger.info("Filtering...")
-
-        for convo in conversations_all:
-            name = convo["name"]
-            id = convo["id"]
-
-            if name == config.channels.logging:
-                if convo_logging:
-                    logger.critical("Found multiple matches for logging convo")
-                    exit(1)
-                convo_logging = convo
-                logger.info(f"Found logging convo {id} {name}")
-
-            elif name == config.channels.testing:
-                if convo_testing:
-                    logger.critical("Found multiple matches for testing convo")
-                    exit(1)
-                convo_testing = convo
-
-            elif name in config.channels.adding:
-                if convo_adding:
-                    logger.critical("Found multiple matches for adding convo")
-                    exit(1)
-                convo_adding = convo
-                logger.info(f"Found adding convo {id} {name}")
-
-            elif name in config.channels.cleanup:
-                convo_cleanup.append(convo)
-                logger.info(f"Found cleanup convo {id} {name}")
+        convo_logging = helpers.get_name_obj(config.channels.logging)
+        convo_testing = helpers.get_name_obj(config.channels.testing)
+        convo_adding = [helpers.get_name_obj(c) for c in config.channels.adding]
+        convo_cleanup = [helpers.get_name_obj(c) for c in config.channels.cleanup]
 
         return ConvoOverview(
             **{
@@ -114,12 +79,14 @@ class Api:
         )
 
     def convo_join_silent(self, channel_id):
-        logger.info(f"Joining {channel_id}")
         if self.live:
+            logger.info(f"Joining {channel_id}")
             self.api.conversations_join(channel=channel_id)
         elif self.test:
             assert channel_id == self.convo_testing()["id"]
             self.api.conversations_join(channel=channel_id)
+        else:
+            logger.info(f"[DRY] Joining {channel_id}")
 
     def convo_dm_by_user_id(self, user_id):
         """
@@ -138,13 +105,6 @@ class Api:
     def convo_list_members(self, channel_id) -> SlackResponse:
         return self.api.conversations_members(channel=channel_id, limit=1000)
 
-    def convo_get_by_name(self, channel_name):
-        for convo in self.conversations():
-            if convo["name"] == channel_name:
-                return convo
-
-        raise RuntimeError("Unable to find channel")
-
     def convo_get(self, channel_id):
         return self.api.conversations_info(channel=channel_id)
 
@@ -155,35 +115,39 @@ class Api:
         return self.api.users_info(user=user_id)
 
     def user_remove(self, channel_id, user_id):
-        logger.debug(f"Removing {user_id} from {channel_id}")
 
         if self.live:
+            logger.debug(f"Removing {user_id} from {channel_id}")
             self.api.conversations_kick(channel=channel_id, user=user_id)
         elif self.test:
             assert channel_id == self.convo_testing()["id"]
             assert user_id == config.testing.user_test
             self.api.conversations_kick(channel=channel_id, user=user_id)
+        else:
+            logger.debug(f"[DRY] Removing {user_id} from {channel_id}")
 
     def user_add(self, channel_id, user_id):
-        logger.debug(f"Adding {user_id} to {channel_id}")
-
         try:
-
             if self.live:
+                logger.debug(f"Adding {user_id} to {channel_id}")
                 self.api.conversations_invite(channel=channel_id, users=user_id)
             elif self.test:
                 assert channel_id == self.convo_testing()["id"]
                 assert user_id == config.testing.user_test
                 self.api.conversations_invite(channel=channel_id, users=user_id)
+            else:
+                logger.debug(f"[DRY] Adding {user_id} to {channel_id}")
 
         except SlackApiError as e:
             if e.response.data["error"] != "already_in_channel":
                 raise e
 
     def msg_user(self, user_id, msg):
-        logger.debug(f"Sending {user_id} a msg")
         if self.live:
+            logger.debug(f"Sending {user_id} a msg")
             self.api.chat_postMessage(channel=user_id, text=msg)
         elif self.test:
             assert user_id == config.testing.user_msg
             self.api.chat_postMessage(channel=user_id, text=msg)
+        else:
+            logger.debug(f"[DRY] Sending {user_id} a msg")

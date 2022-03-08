@@ -17,6 +17,11 @@ def api(auth, config):
     return Api(auth.token, test=True)
 
 
+def test_conversations(config, api):
+    ret = api.conversations()
+    print(ret)
+
+
 def test_dm(config, api):
     test_user_id = config.testing.user_msg
 
@@ -47,7 +52,6 @@ def test_user_channel_test_add(config, api):
     assert target_user_id in members
 
 
-# TODO: Remove test will fail until the app gets the access it needs..
 @pytest.mark.order(after="test_user_channel_test_add")
 def test_user_channel_test_remove(config, auth, api):
     target_channel = api.convo_testing()
