@@ -3,7 +3,7 @@ import pytest
 
 from slack_sdk.errors import SlackApiError
 
-from slack_api import Api
+from slack_api import Api, MsgSentException
 
 from tests.common import auth, config
 
@@ -39,8 +39,12 @@ def test_dm(config, api):
 
 def test_dm_msg(config, api):
     api.msg_user_config_message(config.testing.user_msg)
-    with pytest.raises(RuntimeError):
+    try:
         api.msg_user_config_message(config.testing.user_msg)
+    except MsgSentException:
+        return
+    else:
+        assert False, "MsgSentException not raised"
 
 
 def test_user_channel_test_add(config, api):

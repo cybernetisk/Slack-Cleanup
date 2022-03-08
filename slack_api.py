@@ -211,7 +211,6 @@ class Api:
 
     @retry(SlackApiError, tries=2)
     def msg_user_config_message(self, user_id):
-
         try:
             resp = self.convo_dm_by_user_id(user_id)
             channel_id = resp["id"]
@@ -220,7 +219,7 @@ class Api:
             messages = history.data["messages"]
             if len(messages) == 0:
                 logger.info("No messages found with user")
-            elif self.session_id in history.data["messages"][0]["text"]:
+            elif self.session_id in messages[0]["text"]:
                 logger.info("Msg already sent")
                 raise MsgSentException("Msg already sent")
         except UserNotFoundException as e:
