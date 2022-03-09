@@ -1,10 +1,9 @@
 import pytest
 
-from random import sample
-from string import ascii_lowercase
 
-from slack_api import Api
-from loguru import logger
+from slack_sdk.errors import SlackApiError
+
+from slack_api import Api, MsgSentException
 
 from tests.common import auth, config
 
@@ -25,7 +24,7 @@ def test_conversations(config, api):
 def test_dm(config, api):
     test_user_id = config.testing.user_msg
 
-    noise = "".join(sample(ascii_lowercase, 4))
+    noise = api.session_id
     msg = config.message + f"\n\n\nID:{noise}"
 
     api.msg_user(test_user_id, msg)
@@ -38,13 +37,23 @@ def test_dm(config, api):
     assert history.data["messages"][0]["text"] == msg
 
 
+def test_dm_msg(config, api):
+    api.msg_user_config_message(config.testing.user_msg)
+    try:
+        api.msg_user_config_message(config.testing.user_msg)
+    except MsgSentException:
+        return
+    else:
+        assert False, "MsgSentException not raised"
+
+
 def test_user_channel_test_add(config, api):
     target_channel = api.convo_testing()
     target_user_id = config.testing.user_test
 
     api.convo_join_silent(target_channel["id"])
 
-    api.user_add(target_channel["id"], target_user_id)
+    api.user_add(channel_id=target_channel["id"], user_id=target_user_id)
 
     resp = api.convo_list_members(target_channel["id"])
     members = resp.data["members"]
@@ -62,11 +71,19 @@ def test_user_channel_test_remove(config, auth, api):
     members = resp.data["members"]
     assert target_user_id in members, "User we want to kick not in members"
 
-    api.user_remove(target_channel["id"], target_user_id)
+    api.user_remove(channel_id=target_channel["id"], user_id=target_user_id)
 
     resp = api.convo_list_members(target_channel["id"])
     members = resp.data["members"]
     assert target_user_id not in members, "User we want to kick still there"
+
+
+@pytest.mark.order(after="test_user_channel_test_remove")
+def test_user_channel_test_remove_twice(config, auth, api):
+    target_channel = api.convo_testing()
+    target_user_id = config.testing.user_test
+    with pytest.raises(SlackApiError):
+        api.user_remove(channel_id=target_channel["id"], user_id=target_user_id)
 
 
 def test_list_channels(config, auth, api):

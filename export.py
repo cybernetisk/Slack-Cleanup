@@ -3,7 +3,6 @@ from pathlib import Path
 import json
 from typing import List
 
-import helpers
 from cfg import config
 from loguru import logger
 
@@ -69,20 +68,21 @@ class Export:
     @logger.catch
     def parse_room(self, room_name: str):
         """
-        Fetches
+        Fetches the history for a room and checks all the users interactions in the room.
+        Returns a dict with users and their last seen date
         :return:
         """
 
         # Tracked on user ID and ts
         user_last_seen: dict[str, float] = {}
 
-        def update_if_bigger(user: str, time: float):
-            if user not in user_last_seen:
-                user_last_seen[user] = time
+        def update_if_bigger(username: str, time: float):
+            if username not in user_last_seen:
+                user_last_seen[username] = time
                 return
 
-            if user_last_seen[user] < time:
-                user_last_seen[user] = time
+            if user_last_seen[username] < time:
+                user_last_seen[username] = time
                 return
 
         messages = self.get_room_json(room_name)

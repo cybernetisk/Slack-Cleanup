@@ -56,5 +56,5 @@ def test_convert_dict():
         "annambu": "2017-03-21",
     }
 
-    obj = helpers.convert_dict_to_name_and_id(d)
+    obj = helpers.convert_dict_to_name_and_date(d)
     assert t == obj
