@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import random
+import datetime
 import time
 from typing import List, Dict
 from pydantic import BaseModel
@@ -13,7 +13,6 @@ from cfg import config, auth
 from loguru import logger
 from functools import cache
 
-from string import ascii_lowercase
 
 from retry import retry
 
@@ -45,7 +44,7 @@ class Api:
     def __init__(self, token=None, live=False, test=False):
         self.live = live
         self.test = test
-        self.session_id = "".join(random.sample(ascii_lowercase, 10))
+        self.session_id = datetime.datetime.today().strftime("%Y-%m-%d")
 
         if live:
             logger.warning("We are running in live mode, we will manipulate slack")
@@ -177,8 +176,11 @@ class Api:
             try:
                 self.api.conversations_kick(channel=channel_id, user=user_id)
             except SlackApiError as e:
-                handle_rate_limit(e)
-                raise e
+                if e.response.data["error"] == "not_in_channel":
+                    pass
+                else:
+                    handle_rate_limit(e)
+                    raise e
         elif self.test:
             assert channel_id == self.convo_testing()["id"]
             assert user_id == config.testing.user_test

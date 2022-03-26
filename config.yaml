@@ -1,4 +1,4 @@
-timeout: 800 # Number of days of inactivity that is allowed
+timeout: 360 # Number of days of inactivity that is allowed
 
 testing:
   #user that will get the test notification
@@ -19,6 +19,7 @@ channels:
     - dj
     - utlån
     - økonomi
+    - it
 
 
 # Testes med poetry

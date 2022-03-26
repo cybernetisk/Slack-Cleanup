@@ -38,6 +38,7 @@ def cleanup(
     export = Export()
 
     for channel in api.convo_cleanup():
+        api.convo_join_silent(channel["id"])
         logger.info(f"Checking {channel['name']}")
 
         timestamps = export.parse_room(channel["name"])
@@ -48,10 +49,14 @@ def cleanup(
 
         for user_id, timestamp in users_filtered.items():
             username = helpers.convert_id_to_name(user_id)
+
             date = helpers.convert_epoch_to_date(timestamp)
 
             # DM user
-            api.msg_user_config_message(user_id)
+            try:
+                api.msg_user_config_message(user_id)
+            except slack_api.MsgSentException:
+                pass
 
             # Remove from channel
             logger.info(
